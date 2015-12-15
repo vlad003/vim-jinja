@@ -1,19 +1,19 @@
 " There are two ways in which vim can detect Jinja:
 "   option a: vim detected HTML in which case we will scan the first
 "             50 lines to see if it looks like Jinja and then switch
-"             over to htmljinja.
+"             over to jinja.
 "   option b: vim detected htmldjango in which case we check the first
 "             50 lines to look for Django-ism's.  If we don't find any
-"             we switch to htmljinja.
+"             we switch to jinja.
 "
 " If we already did the detection we don't do anything so that users
 " can still switch manually to a different syntax.
 "
 " Additionally whenever the buffer finished writing and the file type
-" is html we also try to upgrade to htmljinja.  This can be separately
-" disabled with g:htmljinja_disable_html_upgrade
+" is html we also try to upgrade to jinja.  This can be separately
+" disabled with g:jinja_disable_html_upgrade
 
-if exists("g:htmljinja_disable_detection") && g:htmljinja_disable_detection
+if exists("g:jinja_disable_detection") && g:jinja_disable_detection
   finish
 endif
 
@@ -27,7 +27,7 @@ fun! s:TryDetectJinja()
   while n < 50 && n < line("$")
     let line = getline(n)
     if line =~ '{%\s*\(extends\|block\|macro\|set\|if\|for\|include\|trans\)\>' || line =~ '{{\s*\S+[|(]'
-      setlocal filetype=htmljinja
+      setlocal filetype=jinja
       return
     endif
     let n = n + 1
@@ -52,7 +52,7 @@ fun! s:ConsiderSwitchingToJinja()
     endif
     let n = n + 1
   endwhile
-  setlocal filetype=htmljinja
+  setlocal filetype=jinja
 endfun
 
 fun! s:ConsiderSwitchingToJinjaAgain()
@@ -63,6 +63,6 @@ endfun
 autocmd FileType htmldjango call s:ConsiderSwitchingToJinja()
 autocmd FileType html call s:TryDetectJinja()
 
-if !exists("g:htmljinja_disable_html_upgrade") || !g:htmljinja_disable_html_upgrade
+if !exists("g:jinja_disable_html_upgrade") || !g:jinja_disable_html_upgrade
   autocmd BufWritePost *.html,*.htm,*.shtml,*.stm call s:ConsiderSwitchingToJinjaAgain()
 endif
